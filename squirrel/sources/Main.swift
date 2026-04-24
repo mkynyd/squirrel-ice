@@ -15,9 +15,11 @@ struct SquirrelApp {
   } else {
     try! FileManager.default.url(for: .libraryDirectory, in: .userDomainMask, appropriateFor: nil, create: false).appendingPathComponent("Rime", isDirectory: true)
   }
-  static let appDir = "/Library/Input Library/Squirrel.app".withCString { dir in
-    URL(fileURLWithFileSystemRepresentation: dir, isDirectory: false, relativeTo: nil)
-  }
+  // Derive .app bundle path from executable location at runtime, works regardless of install path.
+  static let appDir: URL = {
+    let execURL = Bundle.main.executableURL!  // .../Squirrel.app/Contents/MacOS/Squirrel
+    return execURL.deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+  }()
   static let logDir = FileManager.default.temporaryDirectory.appending(component: "rime.squirrel", directoryHint: .isDirectory)
 
   // swiftlint:disable:next cyclomatic_complexity
