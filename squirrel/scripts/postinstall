@@ -6,8 +6,14 @@ squirrel_app_root="${DSTROOT}/Squirrel.app"
 squirrel_executable="${squirrel_app_root}/Contents/MacOS/Squirrel"
 rime_package_installer="${squirrel_app_root}/Contents/MacOS/rime-install"
 rime_shared_data_path="${squirrel_app_root}/Contents/SharedSupport"
+user_home=`/usr/bin/dscl . -read "/Users/${login_user}" NFSHomeDirectory 2>/dev/null | /usr/bin/awk '{print $2}'`
+user_squirrel_app_root="${user_home}/Library/Input Methods/Squirrel.app"
 
 /usr/bin/sudo -u "${login_user}" /usr/bin/killall Squirrel > /dev/null || true
+
+if [ -n "${user_home}" ] && [ "${user_squirrel_app_root}" != "${squirrel_app_root}" ] && [ -d "${user_squirrel_app_root}" ]; then
+    /bin/rm -rf "${user_squirrel_app_root}"
+fi
 
 "${squirrel_executable}" --register-input-source
 

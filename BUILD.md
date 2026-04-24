@@ -466,8 +466,9 @@ open ~/Developer/WuSongIME/squirrel/Squirrel.xcodeproj
 ```bash
 # 1. 构建后安装
 sudo make install
-# 或手动复制
-cp -r build/Debug/Squirrel.app ~/Library/Input\ Methods/
+# 调试安装也使用系统输入法目录；不要同时保留 ~/Library/Input Methods/Squirrel.app，
+# 否则 macOS 会把两份同 Bundle ID 的输入法都列出来。
+make -C squirrel install-debug ARCHS='arm64'
 
 # 2. 在 Xcode 中：Debug → Attach to Process → Squirrel
 
