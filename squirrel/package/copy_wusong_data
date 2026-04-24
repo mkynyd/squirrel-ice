@@ -1,0 +1,42 @@
+#!/bin/bash
+
+set -euo pipefail
+
+if [[ $# -ne 1 ]]; then
+  echo "usage: $0 /path/to/Squirrel.app" >&2
+  exit 64
+fi
+
+app="$1"
+shared_support="${app}/Contents/SharedSupport"
+
+if [[ ! -d "${app}" ]]; then
+  echo "error: app bundle not found: ${app}" >&2
+  exit 66
+fi
+
+mkdir -p "${shared_support}"
+
+sync_item() {
+  local source="$1"
+  local destination="$2"
+  if [[ -d "${source}" ]]; then
+    rm -rf "${destination}"
+    cp -R "${source}" "${destination}"
+  elif [[ -f "${source}" ]]; then
+    cp "${source}" "${destination}"
+  fi
+}
+
+for dir in cn_dicts en_dicts lua opencc; do
+  sync_item "data/${dir}" "${shared_support}/${dir}"
+done
+
+for file in data/*.yaml data/*.txt; do
+  [[ -e "${file}" ]] || continue
+  cp "${file}" "${shared_support}/"
+done
+
+if [[ -d themes ]]; then
+  sync_item themes "${shared_support}/themes"
+fi

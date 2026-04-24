@@ -1,0 +1,19 @@
+name: WeChat Style
+author: WuSong
+color_scheme:
+  back_color: 0xF7F7F7
+  candidate_back_color: 0xF7F7F7
+  candidate_text_color: 0x222222
+  hilited_candidate_back_color: 0x07C160
+  hilited_candidate_text_color: 0xFFFFFF
+  label_color: 0x999999
+  comment_text_color: 0x999999
+  border_color: 0xE5E5E5
+style:
+  corner_radius: 8
+  border_width: 1
+  border_height: 1
+  font_point: 16
+  label_font_point: 12
+  candidate_list_layout: linear
+  text_orientation: horizontal

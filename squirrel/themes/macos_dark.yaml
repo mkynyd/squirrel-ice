@@ -1,0 +1,19 @@
+name: macOS Dark
+author: WuSong
+color_scheme:
+  back_color: 0x2C2C2E
+  candidate_back_color: 0x2C2C2E
+  candidate_text_color: 0xF5F5F7
+  hilited_candidate_back_color: 0x0A84FF
+  hilited_candidate_text_color: 0xFFFFFF
+  label_color: 0x98989D
+  comment_text_color: 0x98989D
+  border_color: 0x48484A
+style:
+  corner_radius: 8
+  border_width: 1
+  border_height: 1
+  font_point: 16
+  label_font_point: 12
+  candidate_list_layout: linear
+  text_orientation: horizontal

@@ -1,0 +1,19 @@
+name: macOS Light
+author: WuSong
+color_scheme:
+  back_color: 0xFFFFFF
+  candidate_back_color: 0xFFFFFF
+  candidate_text_color: 0x1D1D1F
+  hilited_candidate_back_color: 0x007AFF
+  hilited_candidate_text_color: 0xFFFFFF
+  label_color: 0x8E8E93
+  comment_text_color: 0x8E8E93
+  border_color: 0xD1D1D6
+style:
+  corner_radius: 8
+  border_width: 1
+  border_height: 1
+  font_point: 16
+  label_font_point: 12
+  candidate_list_layout: linear
+  text_orientation: horizontal
