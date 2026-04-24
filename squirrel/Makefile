@@ -192,17 +192,19 @@ SQUIRREL_APP_ROOT = $(DSTROOT)/Squirrel.app
 .PHONY: permission-check install-debug install-release
 
 permission-check:
-	[ -w "$(DSTROOT)" ] && [ -w "$(SQUIRREL_APP_ROOT)" ] || sudo chown -R ${USER} "$(DSTROOT)"
+	[ -d "$(DSTROOT)" ] || sudo mkdir -p "$(DSTROOT)"
 
 install-debug: debug permission-check
-	rm -rf "$(SQUIRREL_APP_ROOT)"
-	cp -R $(DERIVED_DATA_PATH)/Build/Products/Debug/Squirrel.app "$(DSTROOT)"
-	DSTROOT="$(DSTROOT)" RIME_NO_PREBUILD=1 bash scripts/postinstall
+	sudo rm -rf "$(SQUIRREL_APP_ROOT)"
+	sudo cp -R $(DERIVED_DATA_PATH)/Build/Products/Debug/Squirrel.app "$(DSTROOT)"
+	sudo chown -R root:wheel "$(SQUIRREL_APP_ROOT)"
+	sudo DSTROOT="$(DSTROOT)" RIME_NO_PREBUILD=1 bash scripts/postinstall
 
 install-release: release permission-check
-	rm -rf "$(SQUIRREL_APP_ROOT)"
-	cp -R $(DERIVED_DATA_PATH)/Build/Products/Release/Squirrel.app "$(DSTROOT)"
-	DSTROOT="$(DSTROOT)" bash scripts/postinstall
+	sudo rm -rf "$(SQUIRREL_APP_ROOT)"
+	sudo cp -R $(DERIVED_DATA_PATH)/Build/Products/Release/Squirrel.app "$(DSTROOT)"
+	sudo chown -R root:wheel "$(SQUIRREL_APP_ROOT)"
+	sudo DSTROOT="$(DSTROOT)" bash scripts/postinstall
 
 .PHONY: clean clean-deps
 
