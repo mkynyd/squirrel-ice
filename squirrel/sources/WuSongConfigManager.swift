@@ -6,6 +6,7 @@
 import AppKit
 import Combine
 import Foundation
+import SwiftUI
 
 struct WuSongSchemaOption: Identifiable, Hashable {
   let id: String
@@ -28,6 +29,8 @@ final class WuSongConfigManager: ObservableObject {
   @Published var fontPoint = 16.0
   @Published var enabledSchemas: Set<String> = []
   @Published var enabledDictionaries: Set<String> = []
+  @Published var customizingTheme = false
+  @Published var editingTheme: WuSongTheme?
 
   let schemas: [WuSongSchemaOption] = [
     .init(id: "rime_ice", name: "雾凇拼音"),
@@ -72,25 +75,103 @@ final class WuSongConfigManager: ObservableObject {
     }
   }
 
+  func currentTheme() -> WuSongTheme? {
+    themes.first { $0.id == selectedThemeID }
+  }
+
+  func selectedThemeBinding() -> Binding<String> {
+    Binding(
+      get: { self.selectedThemeID },
+      set: { newID in
+        self.selectedThemeID = newID
+        self.applyAppearance()
+      }
+    )
+  }
+
+  func candidateLayoutBinding() -> Binding<String> {
+    Binding(
+      get: { self.candidateLayout },
+      set: { self.candidateLayout = $0; self.applyAppearance() }
+    )
+  }
+
+  func fontPointBinding() -> Binding<Double> {
+    Binding(
+      get: { self.fontPoint },
+      set: { self.fontPoint = $0; self.applyAppearance() }
+    )
+  }
+
+  func keyboardLayoutBinding() -> Binding<String> {
+    Binding(
+      get: { self.keyboardLayout },
+      set: { self.keyboardLayout = $0; self.applyAppearance() }
+    )
+  }
+
+  func schemaBinding(for id: String) -> Binding<Bool> {
+    Binding(
+      get: { self.enabledSchemas.contains(id) },
+      set: { self.setSchema(id, enabled: $0) }
+    )
+  }
+
+  func dictionaryBinding(for id: String) -> Binding<Bool> {
+    Binding(
+      get: { self.enabledDictionaries.contains(id) },
+      set: { self.setDictionary(id, enabled: $0) }
+    )
+  }
+
+  func startCustomizingTheme() {
+    guard let theme = currentTheme() else { return }
+    editingTheme = theme
+    customizingTheme = true
+  }
+
+  func updateEditingThemeColor(_ color: Color, for key: String) {
+    editingTheme?.colorScheme[key] = WuSongTheme.abgrrString(from: color)
+  }
+
+  func saveCustomizedTheme() {
+    guard let theme = editingTheme else { return }
+    let newTheme = WuSongTheme(
+      id: theme.id + "_custom",
+      name: theme.name + "（自定义）",
+      author: theme.author,
+      colorScheme: theme.colorScheme,
+      style: theme.style
+    )
+    ThemeLoader.shared.saveUserTheme(newTheme)
+    reload()
+    if themes.contains(where: { $0.id == newTheme.id }) {
+      selectedThemeID = newTheme.id
+      applyAppearance()
+    }
+    editingTheme = nil
+    customizingTheme = false
+  }
+
+  func cancelCustomizing() {
+    editingTheme = nil
+    customizingTheme = false
+  }
+
   func deployBundledConfigIfNeeded(currentVersion: String) -> Bool {
     guard let sharedSupportURL = Bundle.main.sharedSupportURL,
           fileManager.fileExists(atPath: sharedSupportURL.appendingPathComponent("rime_ice.schema.yaml").path) else {
       return false
     }
-
     try? fileManager.createDirectory(at: userRimeDir, withIntermediateDirectories: true)
     let marker = (try? String(contentsOf: markerURL, encoding: .utf8).trimmingCharacters(in: .whitespacesAndNewlines)) ?? ""
-    guard marker != currentVersion else {
-      return false
-    }
+    guard marker != currentVersion else { return false }
 
     var copiedAnyFile = false
     let entries = (try? fileManager.contentsOfDirectory(at: sharedSupportURL, includingPropertiesForKeys: [.isDirectoryKey])) ?? []
     for sourceURL in entries where shouldCopyBundledRimeEntry(sourceURL) {
       let destinationURL = userRimeDir.appendingPathComponent(sourceURL.lastPathComponent)
-      if fileManager.fileExists(atPath: destinationURL.path) {
-        continue
-      }
+      if fileManager.fileExists(atPath: destinationURL.path) { continue }
       do {
         try fileManager.copyItem(at: sourceURL, to: destinationURL)
         copiedAnyFile = true
@@ -98,7 +179,6 @@ final class WuSongConfigManager: ObservableObject {
         print("Failed to copy bundled Rime data \(sourceURL.lastPathComponent): \(error.localizedDescription)")
       }
     }
-
     do {
       try currentVersion.write(to: markerURL, atomically: true, encoding: .utf8)
     } catch {
@@ -108,21 +188,15 @@ final class WuSongConfigManager: ObservableObject {
   }
 
   func setSchema(_ id: String, enabled: Bool) {
-    if enabled {
-      enabledSchemas.insert(id)
-    } else if id != "rime_ice" {
-      enabledSchemas.remove(id)
-    }
+    if enabled { enabledSchemas.insert(id) }
+    else if id != "rime_ice" { enabledSchemas.remove(id) }
     writeDefaultCustom()
     redeploy()
   }
 
   func setDictionary(_ id: String, enabled: Bool) {
-    if enabled {
-      enabledDictionaries.insert(id)
-    } else if id != "cn_dicts/8105" {
-      enabledDictionaries.remove(id)
-    }
+    if enabled { enabledDictionaries.insert(id) }
+    else if id != "cn_dicts/8105" { enabledDictionaries.remove(id) }
     writeDictionaryCustom()
     redeploy()
   }
@@ -148,9 +222,7 @@ final class WuSongConfigManager: ObservableObject {
 private extension WuSongConfigManager {
   func shouldCopyBundledRimeEntry(_ url: URL) -> Bool {
     let name = url.lastPathComponent
-    if ["cn_dicts", "en_dicts", "lua", "opencc"].contains(name) {
-      return true
-    }
+    if ["cn_dicts", "en_dicts", "lua", "opencc"].contains(name) { return true }
     return url.pathExtension == "yaml" || url.pathExtension == "txt"
   }
 
@@ -188,9 +260,7 @@ private extension WuSongConfigManager {
       "patch:",
       "  schema_list:"
     ]
-    for schema in selected {
-      lines.append("    - schema: \(schema)")
-    }
+    for schema in selected { lines.append("    - schema: \(schema)") }
     write(lines: lines, to: defaultCustomURL)
   }
 
@@ -202,9 +272,7 @@ private extension WuSongConfigManager {
       "patch:",
       "  import_tables:"
     ]
-    for dictionary in selected {
-      lines.append("    - \(dictionary)")
-    }
+    for dictionary in selected { lines.append("    - \(dictionary)") }
     write(lines: lines, to: dictionaryCustomURL)
   }
 
@@ -221,9 +289,7 @@ private extension WuSongConfigManager {
   }
 
   func yamlScalar(_ value: String) -> String {
-    if value.range(of: #"^[A-Za-z0-9_./:-]+$"#, options: .regularExpression) != nil {
-      return value
-    }
+    if value.range(of: #"^[A-Za-z0-9_./:-]+$"#, options: .regularExpression) != nil { return value }
     return "\"" + value.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "\"", with: "\\\"") + "\""
   }
 }
