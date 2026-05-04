@@ -23,10 +23,11 @@ final class WuSongConfigManager: ObservableObject {
   static let configChangedNotificationName = "WuSongConfigChanged"
 
   @Published private(set) var themes: [WuSongTheme] = []
-  @Published var selectedThemeID = "macos_light"
+  @Published var selectedThemeID = "macos_dark"
   @Published var keyboardLayout = "last"
   @Published var candidateLayout = "linear"
-  @Published var fontPoint = 16.0
+  @Published var candidateCount = 5
+  @Published var fontPoint = 14.0
   @Published var enabledSchemas: Set<String> = []
   @Published var enabledDictionaries: Set<String> = []
   @Published var customizingTheme = false
@@ -60,6 +61,7 @@ final class WuSongConfigManager: ObservableObject {
   private var markerURL: URL { userRimeDir.appendingPathComponent(".wusong_version") }
   private var squirrelCustomURL: URL { userRimeDir.appendingPathComponent("squirrel.custom.yaml") }
   private var defaultCustomURL: URL { userRimeDir.appendingPathComponent("default.custom.yaml") }
+  private var schemaCustomURL: URL { userRimeDir.appendingPathComponent("rime_ice.custom.yaml") }
   private var dictionaryCustomURL: URL { userRimeDir.appendingPathComponent("rime_ice.dict.custom.yaml") }
 
   private init() {
@@ -96,6 +98,13 @@ final class WuSongConfigManager: ObservableObject {
     )
   }
 
+  func candidateCountBinding() -> Binding<Int> {
+    Binding(
+      get: { self.candidateCount },
+      set: { self.setCandidateCount($0) }
+    )
+  }
+
   func fontPointBinding() -> Binding<Double> {
     Binding(
       get: { self.fontPoint },
@@ -115,6 +124,15 @@ final class WuSongConfigManager: ObservableObject {
       get: { self.enabledSchemas.contains(id) },
       set: { self.setSchema(id, enabled: $0) }
     )
+  }
+
+  func applySchemas(_ schemas: Set<String>) {
+    var nextSchemas = schemas
+    nextSchemas.insert("rime_ice")
+    enabledSchemas = nextSchemas
+    writeDefaultCustom()
+    writeSchemaBehaviorCustom()
+    redeploy()
   }
 
   func dictionaryBinding(for id: String) -> Binding<Bool> {
@@ -191,6 +209,7 @@ final class WuSongConfigManager: ObservableObject {
     if enabled { enabledSchemas.insert(id) }
     else if id != "rime_ice" { enabledSchemas.remove(id) }
     writeDefaultCustom()
+    writeSchemaBehaviorCustom()
     redeploy()
   }
 
@@ -201,8 +220,15 @@ final class WuSongConfigManager: ObservableObject {
     redeploy()
   }
 
+  func setCandidateCount(_ count: Int) {
+    candidateCount = min(max(count, 3), 9)
+    writeDefaultCustom()
+    redeploy()
+  }
+
   func applyAppearance() {
     writeSquirrelCustom()
+    writeSchemaBehaviorCustom()
     redeploy()
   }
 
@@ -236,7 +262,15 @@ private extension WuSongConfigManager {
       "  style/color_scheme: \(yamlScalar(selectedThemeID))",
       "  style/color_scheme_dark: \(yamlScalar(selectedThemeID))",
       "  style/candidate_list_layout: \(yamlScalar(candidateLayout))",
-      "  style/font_point: \(fontPoint)"
+      "  style/font_point: \(fontPoint)",
+      "  style/candidate_format: \"[label] [candidate] [comment]\"",
+      "  style/show_paging: true",
+      "  style/hilited_corner_radius: 4",
+      "  style/corner_radius: 6",
+      "  style/border_width: 2",
+      "  style/border_height: 2",
+      "  style/line_spacing: 0",
+      "  style/shadow_size: 0"
     ]
     if let theme = theme {
       lines.append("  \"preset_color_schemes/\(theme.id)\":")
@@ -258,10 +292,21 @@ private extension WuSongConfigManager {
     var lines = [
       "# WuSong generated schema settings.",
       "patch:",
+      "  menu/page_size: \(candidateCount)",
       "  schema_list:"
     ]
     for schema in selected { lines.append("    - schema: \(schema)") }
     write(lines: lines, to: defaultCustomURL)
+  }
+
+  func writeSchemaBehaviorCustom() {
+    try? fileManager.createDirectory(at: userRimeDir, withIntermediateDirectories: true)
+    let lines = [
+      "# WuSong generated schema behavior settings.",
+      "patch:",
+      "  switches/@0/reset: 0"
+    ]
+    write(lines: lines, to: schemaCustomURL)
   }
 
   func writeDictionaryCustom() {

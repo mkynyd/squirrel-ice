@@ -166,9 +166,11 @@ clean-sparkle:
 	rm -rf Frameworks/* > /dev/null 2>&1 || true
 	rm -rf Sparkle/build > /dev/null 2>&1 || true
 
-.PHONY: package archive
+.PHONY: package archive force-package
 
-$(PACKAGE):
+force-package:
+
+$(PACKAGE): force-package
 ifdef DEV_ID
 	bash package/sign_app "$(DEV_ID)" "$(DERIVED_DATA_PATH)"
 endif

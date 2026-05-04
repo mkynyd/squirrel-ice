@@ -168,19 +168,58 @@ private extension ThemeLoader {
   }
 
   static let fallbackThemes = [
+    WuSongTheme(id: "macos_dark",
+                name: "macOS Dark",
+                author: "WuSong",
+                colorScheme: [
+                  "back_color": "0x1F1F1F",
+                  "candidate_text_color": "0xD7D7D7",
+                  "hilited_candidate_back_color": "0x0B9F5A",
+                  "hilited_candidate_text_color": "0xFFFFFF",
+                  "hilited_candidate_label_color": "0xFFFFFF",
+                  "label_color": "0x7A7A7A",
+                  "comment_text_color": "0x7A7A7A"
+                ],
+                style: [
+                  "alpha": "1",
+                  "corner_radius": "6",
+                  "hilited_corner_radius": "4",
+                  "border_width": "2",
+                  "border_height": "2",
+                  "line_spacing": "0",
+                  "shadow_size": "0",
+                  "show_paging": "true",
+                  "candidate_format": "[label] [candidate] [comment]",
+                  "candidate_list_layout": "linear",
+                  "text_orientation": "horizontal",
+                  "font_point": "14",
+                  "label_font_point": "12"
+                ]),
     WuSongTheme(id: "macos_light",
                 name: "macOS Light",
                 author: "WuSong",
                 colorScheme: [
-                  "back_color": "0xFFFFFF",
-                  "candidate_text_color": "0x1D1D1F",
-                  "hilited_candidate_back_color": "0x007AFF",
-                  "hilited_candidate_text_color": "0xFFFFFF"
+                  "back_color": "0xF8F8F8",
+                  "candidate_text_color": "0x202020",
+                  "hilited_candidate_back_color": "0x00000000",
+                  "hilited_candidate_text_color": "0x0B9F5A",
+                  "hilited_candidate_label_color": "0x0B9F5A",
+                  "label_color": "0x505050",
+                  "comment_text_color": "0x8A8A8A"
                 ],
                 style: [
+                  "alpha": "1",
+                  "corner_radius": "6",
+                  "hilited_corner_radius": "4",
+                  "border_width": "2",
+                  "border_height": "2",
+                  "line_spacing": "0",
+                  "shadow_size": "0",
+                  "show_paging": "true",
+                  "candidate_format": "[label] [candidate] [comment]",
                   "candidate_list_layout": "linear",
                   "text_orientation": "horizontal",
-                  "font_point": "16",
+                  "font_point": "14",
                   "label_font_point": "12"
                 ])
   ]

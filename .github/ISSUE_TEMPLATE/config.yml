@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Build and packaging notes
+    url: https://github.com/mkynyd/squirrel-ice/blob/main/BUILD.md
+    about: Read this before filing local build or signing issues.

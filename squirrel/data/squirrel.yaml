@@ -43,8 +43,8 @@ app_options:
 
 style:
   # 选择皮肤，亮色与暗色主题
-  color_scheme: purity_of_form_custom
-  color_scheme_dark: purity_of_form_custom
+  color_scheme: wusong_sample_light
+  color_scheme_dark: wusong_sample_dark
 
   # 以下是预设选项。如果皮肤没写，则使用这些属性；如果皮肤写了，使用皮肤的。
 
@@ -58,19 +58,19 @@ style:
   memorize_size: true             # true | false  候选窗口吸附到屏幕边缘，以减少位置跳动
   mutual_exclusive: false         # true | false  半透明颜色进行叠加计算
   translucency: false             # true | false  磨砂背景，仅在背景颜色为透明时可见
-  show_paging: false              # true | false  上下翻页可用的小箭头提示
-  corner_radius: 7                # 外边框 圆角半径
-  hilited_corner_radius: 0        # 选中框 圆角半径
-  border_height: -2               # 外边框 高
-  border_width: -2                # 外边框 宽
-  line_spacing: 5                 # stacked竖向布局的行间距间距
+  show_paging: true               # true | false  上下翻页可用的小箭头提示
+  corner_radius: 6                # 外边框 圆角半径
+  hilited_corner_radius: 4        # 选中框 圆角半径
+  border_height: 2                # 外边框 高
+  border_width: 2                 # 外边框 宽
+  line_spacing: 0                 # stacked竖向布局的行间距间距
   spacing: 8                      # 非linear行内模式下，预编辑文本与候选框之间的间距
   shadow_size: 0                  # 阴影大小
   #surrounding_extra_expansion: 0 # 控制未高亮候选项背景相对于高亮项的大小，负值缩小，正值放大
 
   # 候选项格式化
   # %@ 和 %c 在鼠须管 1.0 弃用，%@ 等同于 "[candidate] [comment]"，%c 于等同 "[label]"
-  candidate_format: '[label]. [candidate] [comment]'
+  candidate_format: '[label] [candidate] [comment]'
 
   #base_offset: 0                 # 字基高
   font_face: 'Avenir'
@@ -83,6 +83,64 @@ style:
 
 # 皮肤列表
 preset_color_schemes:
+  wusong_sample_dark:
+    name: "雾凇样例深色／WuSong Sample Dark"
+    author: WuSong
+    font_face: ""
+    font_point: 14
+    label_font_point: 12
+    candidate_list_layout: linear
+    text_orientation: horizontal
+    inline_preedit: true
+    inline_candidate: false
+    translucency: false
+    mutual_exclusive: false
+    show_paging: true
+    border_height: 2
+    border_width: 2
+    corner_radius: 6
+    hilited_corner_radius: 4
+    shadow_size: 0
+    line_spacing: 0
+    alpha: 1
+    candidate_format: '[label] [candidate] [comment]'
+    back_color: 0x1F1F1F
+    label_color: 0x7A7A7A
+    hilited_candidate_label_color: 0xFFFFFF
+    candidate_text_color: 0xD7D7D7
+    hilited_candidate_text_color: 0xFFFFFF
+    comment_text_color: 0x7A7A7A
+    hilited_candidate_back_color: 0x0B9F5A
+
+  wusong_sample_light:
+    name: "雾凇样例浅色／WuSong Sample Light"
+    author: WuSong
+    font_face: ""
+    font_point: 14
+    label_font_point: 12
+    candidate_list_layout: linear
+    text_orientation: horizontal
+    inline_preedit: true
+    inline_candidate: false
+    translucency: false
+    mutual_exclusive: false
+    show_paging: true
+    border_height: 2
+    border_width: 2
+    corner_radius: 6
+    hilited_corner_radius: 4
+    shadow_size: 0
+    line_spacing: 0
+    alpha: 1
+    candidate_format: '[label] [candidate] [comment]'
+    back_color: 0xF8F8F8
+    label_color: 0x505050
+    hilited_candidate_label_color: 0x0B9F5A
+    candidate_text_color: 0x202020
+    hilited_candidate_text_color: 0x0B9F5A
+    comment_text_color: 0x8A8A8A
+    hilited_candidate_back_color: 0x00000000
+
   # 对 purity_of_form 略微调整颜色，让色彩更柔和点，补全其他选项和注释
   purity_of_form_custom:
     name: "純粹的形式／Purity of Form Custom"

@@ -1,0 +1,51 @@
+name: Bug report
+description: Report a reproducible problem in WuSong IME.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a problem. Clear reproduction steps make fixes much faster.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What happened?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      description: List the exact steps that reproduce the issue.
+      placeholder: |
+        1. Install or build ...
+        2. Open ...
+        3. Type ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: |
+        macOS:
+        CPU: Apple Silicon or Intel
+        Build type: local build or release package
+        Commit or version:
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or screenshots
+      description: Include relevant `~/Library/Rime/rime.log` lines or screenshots if available.
+    validations:
+      required: false

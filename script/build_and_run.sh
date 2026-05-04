@@ -1,22 +1,34 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -euo pipefail
 
-cd "$(dirname "$0")/.."
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT_DIR"
 
 configuration=Debug
-verify=0
+mode=run
+app_name=Squirrel
+bundle_id=im.rime.inputmethod.Squirrel
 
 for arg in "$@"; do
   case "$arg" in
     --release)
       configuration=Release
       ;;
+    --debug)
+      mode=debug
+      ;;
+    --logs)
+      mode=logs
+      ;;
+    --telemetry)
+      mode=telemetry
+      ;;
     --verify)
-      verify=1
+      mode=verify
       ;;
     *)
-      echo "unknown argument: $arg" >&2
+      echo "usage: $0 [--release] [--debug|--logs|--telemetry|--verify]" >&2
       exit 64
       ;;
   esac
@@ -29,14 +41,32 @@ else
 fi
 
 app="squirrel/build/Build/Products/${configuration}/Squirrel.app"
+binary="$app/Contents/MacOS/Squirrel"
 
-if pgrep -x Squirrel >/dev/null 2>&1; then
-  killall Squirrel || true
-fi
+pkill -x "$app_name" >/dev/null 2>&1 || true
 
-/usr/bin/open -n "$app"
+open_app() {
+  /usr/bin/open -n "$app"
+}
 
-if [[ "$verify" -eq 1 ]]; then
-  sleep 2
-  pgrep -x Squirrel >/dev/null
-fi
+case "$mode" in
+  run)
+    open_app
+    ;;
+  debug)
+    lldb -- "$binary"
+    ;;
+  logs)
+    open_app
+    /usr/bin/log stream --info --style compact --predicate "process == \"$app_name\""
+    ;;
+  telemetry)
+    open_app
+    /usr/bin/log stream --info --style compact --predicate "subsystem == \"$bundle_id\""
+    ;;
+  verify)
+    open_app
+    sleep 2
+    pgrep -x "$app_name" >/dev/null
+    ;;
+esac
